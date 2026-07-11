@@ -194,6 +194,36 @@ async function autoSeed() {
   }
 }
 
+// ── Developer Diagnostics ───────────────────────────────────────────
+app.get("/dev/diagnostics", async (req, res) => {
+  if (process.env.NODE_ENV === "production") {
+    return res.status(403).json({ error: "Diagnostics unavailable in production" });
+  }
+  
+  const start = Date.now();
+  let qdrantStatus = { status: "unknown" };
+  let cloudStatus = { status: "unknown" };
+  
+  try {
+    qdrantStatus = await qdrant.getHealthStatus();
+  } catch (err) {}
+  
+  try {
+    cloudStatus = await cloudinary.getHealthStatus();
+  } catch (err) {}
+
+  res.json({
+    environment: process.env.NODE_ENV || "development",
+    mongodb: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+    qdrant: qdrantStatus,
+    cloudinary: cloudStatus,
+    weatherAPI: process.env.WEATHER_API_KEY ? "configured" : "missing",
+    geminiAPI: process.env.GEMINI_API_KEY ? "configured" : "missing",
+    uptime: process.uptime(),
+    responseTimeMs: Date.now() - start
+  });
+});
+
 // ── Frontend Production Serving ─────────────────────────────────────
 const frontendPath = path.join(__dirname, "..", "frontendfinalprolly");
 if (fs.existsSync(frontendPath)) {

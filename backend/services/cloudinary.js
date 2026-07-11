@@ -81,7 +81,12 @@ async function syncPendingUploads() {
     let successCount = 0;
 
     for (const item of pendingItems) {
-      if (!item.image_url) continue;
+      if (!item.image_url) {
+        item.cloud_status = "failed";
+        await item.save();
+        console.warn(`[Cloudinary Recovery] Item ${item._id} has no image_url.`);
+        continue;
+      }
       
       const localFilePath = path.join(__dirname, "..", item.image_url);
       if (fs.existsSync(localFilePath)) {
@@ -92,6 +97,11 @@ async function syncPendingUploads() {
           item.cloud_status = "synced";
           await item.save();
           successCount++;
+        } else {
+          // Upload failed (e.g. invalid image), mark as failed to stop infinite loop
+          item.cloud_status = "failed";
+          await item.save();
+          console.warn(`[Cloudinary Recovery] Upload failed for item ${item._id}, marking as failed.`);
         }
       } else {
         // Local file is missing, we can't sync it

@@ -36,40 +36,34 @@ async function getWeather(city, lat = null, lon = null) {
   }
 
   try {
-    let url = "";
+    let query = "";
     if (lat && lon) {
-      url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+      query = `${lat},${lon}`;
     } else {
-      url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
+      query = encodeURIComponent(city);
     }
+    const url = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${query}`;
 
     const res = await fetch(url);
     const data = await res.json();
 
-    if (data.cod !== 200) {
-      console.warn(`[Weather] API Error: ${data.message}. Falling back to mock data for UI testing.`);
-      return {
-        temp: 22,
-        humidity: 55,
-        condition: 'Clear',
-        icon: '01d',
-        city: city || 'Your Location',
-        type: 'PLEASANT'
-      };
+    if (!res.ok) {
+      console.warn(`[Weather] API Error: ${data.error?.message || res.statusText}. Falling back to Mood-only.`);
+      return null;
     }
 
-    const tempC = data.main.temp;
-    const condition = data.weather[0].main;
-    const rain_mm = data.rain ? (data.rain["1h"] || 0) : 0;
+    const tempC = data.current.temp_c;
+    const condition = data.current.condition.text;
+    const rain_mm = data.current.precip_mm || 0;
     
     const weatherType = classifyWeather(tempC, rain_mm, condition);
 
     const result = {
       temp: tempC,
-      humidity: data.main.humidity,
+      humidity: data.current.humidity,
       condition,
-      icon: data.weather[0].icon,
-      city: data.name,
+      icon: data.current.condition.icon.replace(/^\/\//, "https://"), // Ensure https
+      city: data.location.name,
       type: weatherType
     };
 
@@ -79,14 +73,7 @@ async function getWeather(city, lat = null, lon = null) {
     return result;
   } catch (err) {
     console.error("[Weather] Failed to fetch weather:", err.message);
-    return {
-      temp: 22,
-      humidity: 55,
-      condition: 'Clear',
-      icon: '01d',
-      city: city || 'Your Location',
-      type: 'PLEASANT'
-    };
+    return null;
   }
 }
 
