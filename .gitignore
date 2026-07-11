@@ -64,9 +64,6 @@ temp/
 *.sqlite3
 
 # AI / ML Large files
-*.keras
-*.h5
-*.hdf5
 training_log.txt
 
 # Datasets & Local Caches
