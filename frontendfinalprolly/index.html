@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f7efe4">
+  <meta name="description" content="AffectSync - wardrobe intelligence that dresses with your mood.">
+  <title>AffectSync | Wardrobe Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=2">
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+</head>
+<body>
+  <div class="ambient" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- ── Auth Gate (Login / Register) ──────────────────────────────── -->
+  <div id="authGate" class="auth-gate">
+    <div class="auth-container panel">
+      <div class="auth-brand">
+        <strong>Affect<span>Sync</span></strong>
+        <small>WARDROBE INTELLIGENCE</small>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" class="auth-form">
+        <h2>Welcome Back</h2>
+        <p class="auth-sub">Sign in to your style profile</p>
+        <div class="field">
+          <label for="loginUser">Username</label>
+          <input class="control" id="loginUser" type="text" placeholder="e.g. test_male" required>
+        </div>
+        <div class="field">
+          <label for="loginPass">Password</label>
+          <input class="control" id="loginPass" type="password" placeholder="••••••" required>
+        </div>
+        <div id="loginError" class="auth-error"></div>
+        <button class="button primary" type="submit" style="width:100%">Sign in <span>→</span></button>
+        <p class="auth-switch">New here? <button type="button" class="text-link" id="showRegister">Create account</button></p>
+      </form>
+
+      <!-- Register Form (multi-step) -->
+      <form id="registerForm" class="auth-form" style="display:none">
+        <h2>Create Account</h2>
+        <p class="auth-sub">Set up your style profile</p>
+
+        <!-- Step 1: Credentials -->
+        <div id="regStep1" class="reg-step">
+          <div class="field">
+            <label for="regUser">Username</label>
+            <input class="control" id="regUser" type="text" placeholder="Choose a username" required>
+          </div>
+          <div class="field">
+            <label for="regPass">Password</label>
+            <input class="control" id="regPass" type="password" placeholder="Min 4 characters" required minlength="4">
+          </div>
+          <div class="field">
+            <label for="regGender">Gender</label>
+            <select class="control" id="regGender" required>
+              <option value="">Select</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+          <button type="button" class="button primary" id="regNext1" style="width:100%">Next: Body Profile <span>→</span></button>
+        </div>
+
+        <!-- Step 2: Body profile -->
+        <div id="regStep2" class="reg-step" style="display:none">
+          <div class="field-row">
+            <div class="field">
+              <label for="regHeight">Height (cm)</label>
+              <input class="control" id="regHeight" type="number" placeholder="175">
+            </div>
+            <div class="field">
+              <label for="regWeight">Weight (kg)</label>
+              <input class="control" id="regWeight" type="number" placeholder="70">
+            </div>
+          </div>
+          <div class="field">
+            <label for="regBodyType">Body Type</label>
+            <select class="control" id="regBodyType">
+              <option value="Average">Average</option>
+              <option value="Athletic">Athletic</option>
+              <option value="Slim">Slim</option>
+              <option value="Broad">Broad</option>
+              <option value="Hourglass">Hourglass</option>
+              <option value="Pear">Pear</option>
+              <option value="Apple">Apple</option>
+              <option value="Rectangle">Rectangle</option>
+              <option value="Petite">Petite</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="regSkinTone">Skin Tone</label>
+              <select class="control" id="regSkinTone">
+                <option value="Medium">Medium</option>
+                <option value="Fair">Fair</option>
+                <option value="Light">Light</option>
+                <option value="Olive">Olive</option>
+                <option value="Brown">Brown</option>
+                <option value="Dark">Dark</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="regHairType">Hair Type</label>
+              <select class="control" id="regHairType">
+                <option value="Straight">Straight</option>
+                <option value="Wavy">Wavy</option>
+                <option value="Curly">Curly</option>
+                <option value="Coily">Coily</option>
+              </select>
+            </div>
+          </div>
+          <button type="button" class="button primary" id="regNext2" style="width:100%">Next: Style Preferences <span>→</span></button>
+          <button type="button" class="button ghost" id="regBack1" style="width:100%">← Back</button>
+        </div>
+
+        <!-- Step 3: Style preferences -->
+        <div id="regStep3" class="reg-step" style="display:none">
+          <div class="field">
+            <label for="regStyle">Style Personality</label>
+            <select class="control" id="regStyle">
+              <option value="Minimal">Minimal</option>
+              <option value="Streetwear">Streetwear</option>
+              <option value="Classic">Classic</option>
+              <option value="Bohemian">Bohemian</option>
+              <option value="Edgy">Edgy</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="regFit">Preferred Fit</label>
+            <select class="control" id="regFit">
+              <option value="Regular">Regular</option>
+              <option value="Oversized">Oversized</option>
+              <option value="Slim">Slim</option>
+              <option value="Relaxed">Relaxed</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Color Preference</label>
+            <div class="chip-select" id="regColors">
+              <button type="button" class="chip toggleable" data-value="Neutral">Neutral</button>
+              <button type="button" class="chip toggleable" data-value="Earthy">Earthy</button>
+              <button type="button" class="chip toggleable" data-value="Pastel">Pastel</button>
+              <button type="button" class="chip toggleable" data-value="Bold">Bold</button>
+              <button type="button" class="chip toggleable" data-value="Dark">Dark</button>
+              <button type="button" class="chip toggleable" data-value="Monochrome">Monochrome</button>
+            </div>
+          </div>
+          <div id="regError" class="auth-error"></div>
+          <button type="submit" class="button primary" style="width:100%">Create Account <span>→</span></button>
+          <button type="button" class="button ghost" id="regBack2" style="width:100%">← Back</button>
+        </div>
+
+        <p class="auth-switch">Already have an account? <button type="button" class="text-link" id="showLogin">Sign in</button></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Main App (shown after login) ────────────────────────────── -->
+  <header class="site-header" id="siteHeader" style="display:none">
+    <a class="brand" href="#home" aria-label="AffectSync home">
+      <strong>Affect<span>Sync</span></strong>
+      <small>WARDROBE INTELLIGENCE</small>
+    </a>
+    <nav class="main-nav" aria-label="Primary navigation">
+      <a href="#home" data-route="home">Home</a>
+      <a href="#wardrobe" data-route="wardrobe">Wardrobe</a>
+      <a href="#outfits" data-route="outfits">Outfits</a>
+      <a href="#weather" data-route="weather">Weather</a>
+      <a href="#mood" data-route="mood">Mood</a>
+      <a href="#profile" data-route="profile">Profile</a>
+    </nav>
+    <button class="mood-orb" id="faceScan" aria-label="Open face mood scan">
+      <span class="orb-copy"><small>Current mood</small><b id="headerMood">Happy</b></span>
+      <span class="orb-ring"><span>⌁</span></span>
+    </button>
+    <button class="menu-button" id="menuButton" aria-label="Toggle menu">☰</button>
+  </header>
+
+  <main id="app" tabindex="-1" style="display:none"></main>
+
+  <footer id="siteFooter" style="display:none">
+    <a class="brand footer-brand" href="#home"><strong>Affect<span>Sync</span></strong></a>
+    <p>Style that listens to how you feel.</p>
+    <p>Built with Flask emotion intelligence and Node + Mongo + Qdrant wardrobe service.</p>
+  </footer>
+
+  <!-- ── Face Scan Dialog ────────────────────────────────────────── -->
+  <dialog id="scanDialog" class="scan-dialog">
+    <button class="dialog-close" data-close aria-label="Close">×</button>
+    <div class="scanner">
+      <video id="camera" autoplay playsinline muted></video>
+      <div class="scan-frame"><i></i></div>
+      <div class="camera-placeholder">
+        <span>◎</span>
+        <p>Camera preview</p>
+      </div>
+    </div>
+    <div class="scan-copy">
+      <span class="eyebrow">AFFECT ANALYSIS</span>
+      <h2>Let your expression set the tone.</h2>
+      <p>Your camera will scan for 7 seconds and detect your emotion using our Keras AI model. The site theme will update to match your mood.</p>
+      <div class="scan-status" id="scanStatus">Camera is off</div>
+      <button class="button primary" id="startCamera">Start face scan <span>→</span></button>
+      <button class="button ghost" id="demoScan">Use demo detection</button>
+    </div>
+  </dialog>
+
+  <!-- ── Upload Dialog ───────────────────────────────────────────── -->
+  <dialog id="uploadDialog" class="scan-dialog upload-dialog">
+    <button class="dialog-close" data-close-upload aria-label="Close">×</button>
+    <div class="upload-preview-area">
+      <div class="upload-preview-placeholder" id="uploadPreview">
+        <span>📷</span>
+        <p>Click to select image</p>
+      </div>
+      <img id="uploadPreviewImg" class="upload-preview-img" style="display:none" alt="Preview">
+    </div>
+    <form class="upload-form" id="uploadForm">
+      <span class="eyebrow">ADD TO WARDROBE</span>
+      <h2>Upload a Clothing Item</h2>
+      <div class="field">
+        <label for="uploadName">Item Name</label>
+        <input class="control" id="uploadName" type="text" placeholder="e.g. White Oxford Shirt" required>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="uploadCategory">Category *</label>
+          <select class="control" id="uploadCategory" required>
+            <option value="">Select</option>
+            <option value="top">Top</option>
+            <option value="bottom">Bottom</option>
+            <option value="layer">Layer</option>
+            <option value="footwear">Footwear</option>
+            <option value="accessory">Accessory</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="uploadSubtype">Type</label>
+          <input class="control" id="uploadSubtype" type="text" placeholder="e.g. hoodie, jeans">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="uploadFit">Fit</label>
+          <select class="control" id="uploadFit">
+            <option value="">Auto-detect via AI</option>
+            <option value="regular">Regular</option>
+            <option value="oversized">Oversized</option>
+            <option value="slim">Slim</option>
+            <option value="cropped">Cropped</option>
+            <option value="wide">Wide</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="uploadOccasion">Occasion</label>
+          <select class="control" id="uploadOccasion" multiple>
+            <option value="casual">Casual</option>
+            <option value="formal">Formal</option>
+            <option value="party">Party</option>
+            <option value="traditional">Traditional</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Colors</label>
+        <div class="chip-select" id="uploadColors">
+          <button type="button" class="chip toggleable" data-value="dark">Dark</button>
+          <button type="button" class="chip toggleable" data-value="light">Light</button>
+          <button type="button" class="chip toggleable" data-value="bright">Bright</button>
+          <button type="button" class="chip toggleable" data-value="black">Black</button>
+          <button type="button" class="chip toggleable" data-value="white">White</button>
+          <button type="button" class="chip toggleable" data-value="beige">Beige</button>
+          <button type="button" class="chip toggleable" data-value="pink">Pink</button>
+          <button type="button" class="chip toggleable" data-value="blue">Blue</button>
+          <button type="button" class="chip toggleable" data-value="green">Green</button>
+          <button type="button" class="chip toggleable" data-value="grey">Grey</button>
+          <button type="button" class="chip toggleable" data-value="brown">Brown</button>
+          <button type="button" class="chip toggleable" data-value="pastel">Pastel</button>
+          <button type="button" class="chip toggleable" data-value="sage">Sage</button>
+          <button type="button" class="chip toggleable" data-value="lavender">Lavender</button>
+          <button type="button" class="chip toggleable" data-value="navy">Navy</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="uploadLabels">Labels / Tags</label>
+        <input class="control" id="uploadLabels" type="text" placeholder="e.g. gym, date night, weekend (comma-separated)">
+      </div>
+      <button type="submit" class="button primary" style="width:100%">Upload Item <span>→</span></button>
+    </form>
+  </dialog>
+
+  <!-- ── Profile Edit Dialog ─────────────────────────────────────── -->
+  <dialog id="profileEditDialog" class="scan-dialog">
+    <button class="dialog-close" data-close-profile aria-label="Close">×</button>
+    <div class="scan-copy" style="grid-column: 1 / -1; max-width:500px; margin:0 auto;">
+      <span class="eyebrow">EDIT PROFILE</span>
+      <h2>Update Your Style Profile</h2>
+      <form id="profileEditForm">
+        <div class="field-row">
+          <div class="field"><label>Height (cm)</label><input class="control" id="editHeight" type="number"></div>
+          <div class="field"><label>Weight (kg)</label><input class="control" id="editWeight" type="number"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Body Type</label><select class="control" id="editBodyType"><option value="Average">Average</option><option value="Athletic">Athletic</option><option value="Slim">Slim</option><option value="Broad">Broad</option><option value="Hourglass">Hourglass</option><option value="Pear">Pear</option><option value="Apple">Apple</option><option value="Rectangle">Rectangle</option><option value="Petite">Petite</option></select></div>
+          <div class="field"><label>Skin Tone</label><select class="control" id="editSkinTone"><option value="Fair">Fair</option><option value="Light">Light</option><option value="Medium">Medium</option><option value="Olive">Olive</option><option value="Brown">Brown</option><option value="Dark">Dark</option></select></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Style</label><select class="control" id="editStyle"><option value="Minimal">Minimal</option><option value="Streetwear">Streetwear</option><option value="Classic">Classic</option><option value="Bohemian">Bohemian</option><option value="Edgy">Edgy</option></select></div>
+          <div class="field"><label>Fit</label><select class="control" id="editFit"><option value="Regular">Regular</option><option value="Oversized">Oversized</option><option value="Slim">Slim</option><option value="Relaxed">Relaxed</option></select></div>
+        </div>
+        <button type="submit" class="button primary" style="width:100%;margin-top:16px">Save Changes <span>→</span></button>
+      </form>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <input type="file" id="itemUpload" accept="image/*" hidden>
+  <script src="app.js?v=2"></script>
+</body>
+</html>

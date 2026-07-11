@@ -1,0 +1,14 @@
+{
+  "name": "affectsync",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AffectSync — Emotion-led wardrobe intelligence. Single launcher for all services.",
+  "scripts": {
+    "dev": "node start.js",
+    "start": "node start.js",
+    "seed": "node backend/seed.js"
+  },
+  "dependencies": {
+    "@qdrant/js-client-rest": "^1.18.0"
+  }
+}
