@@ -125,6 +125,15 @@ async function initQdrant() {
       console.log(`[Qdrant] Created collection '${COLLECTION_NAME}' (${VECTOR_SIZE} dims, Cosine)`);
     }
 
+    // Ensure payload indexes exist for strict searching
+    try {
+      await client.createPayloadIndex(COLLECTION_NAME, { field_name: "userId", field_schema: "keyword" });
+      await client.createPayloadIndex(COLLECTION_NAME, { field_name: "category", field_schema: "keyword" });
+      await client.createPayloadIndex(COLLECTION_NAME, { field_name: "mongoId", field_schema: "keyword" });
+    } catch (indexErr) {
+      // Indexes might already exist
+    }
+
     return true;
   } catch (err) {
     console.error(`[Qdrant] Connection failed (${QDRANT_URL}): ${err.message}`);
