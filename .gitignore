@@ -75,3 +75,6 @@ datasets/
 training_data/
 models/
 weights/
+
+# Documentation (Local Only)
+PROJECT_DOCUMENTATION/

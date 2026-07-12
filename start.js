@@ -49,7 +49,11 @@ const children = [];
 function shutdown() {
   console.log(`\n${COLORS.red}[Launcher] Shutting down all services...${COLORS.reset}`);
   children.forEach((child) => {
-    try { child.kill("SIGTERM"); } catch {}
+    if (process.platform === "win32") {
+      spawn("taskkill", ["/pid", child.pid, "/f", "/t"]);
+    } else {
+      try { child.kill("SIGTERM"); } catch {}
+    }
   });
   setTimeout(() => process.exit(0), 1500);
 }
