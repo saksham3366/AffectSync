@@ -126,6 +126,8 @@ async function queryItemsFallback(userId, category, excludeIds, limit = 15) {
     ...item,
     mongoId: item._id.toString(),
     colors: item.color_spectrum || [],
+    image_url: item.cloudinary_url || item.image_url,
+    imageUrl: item.cloudinary_url || item.image_url,
   }));
 }
 

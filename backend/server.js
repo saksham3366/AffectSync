@@ -22,7 +22,11 @@ function checkEnvVars() {
 }
 
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/affectsync";
+const MONGO_URI = process.env.MONGO_URI;
+if (!MONGO_URI) {
+  console.error("[FATAL] MONGO_URI is missing in .env");
+  process.exit(1);
+}
 
 // ── Middleware ───────────────────────────────────────────────────────
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
@@ -237,10 +241,33 @@ if (fs.existsSync(frontendPath)) {
 // ── Start Server ────────────────────────────────────────────────────
 async function start() {
   checkEnvVars();
-  try {
-    await mongoose.connect(MONGO_URI);
-    console.log(`[Server] Connected to MongoDB at ${MONGO_URI}`);
 
+  const mongooseOptions = {
+    serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
+    socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+  };
+
+  mongoose.connection.on('disconnected', () => {
+    console.warn("[WARNING] MongoDB Atlas Offline. Attempting Reconnect...");
+  });
+
+  let connected = false;
+  let retryDelay = 1000;
+
+  while (!connected) {
+    try {
+      await mongoose.connect(MONGO_URI, mongooseOptions);
+      console.log(`[Server] Connected to MongoDB Atlas successfully!`);
+      connected = true;
+    } catch (err) {
+      console.error(`[ERROR] Failed to connect to Atlas: ${err.message}`);
+      console.log(`[Server] Retrying connection in ${retryDelay / 1000} seconds...`);
+      await new Promise(res => setTimeout(res, retryDelay));
+      if (retryDelay < 8000) retryDelay *= 2;
+    }
+  }
+
+  try {
     // Initialize Qdrant
     await qdrant.initQdrant();
     qdrant.startAutoRecovery();
@@ -254,12 +281,11 @@ async function start() {
     app.listen(PORT, () => {
       console.log(`\n========================================`);
       console.log(`  AffectSync Backend running on :${PORT}`);
-      console.log(`  MongoDB: ${MONGO_URI}`);
       console.log(`  Health: http://localhost:${PORT}/api/health`);
       console.log(`========================================\n`);
     });
   } catch (err) {
-    console.error("[Server] Failed to start:", err.message);
+    console.error("[Server] Failed to start services:", err.message);
     process.exit(1);
   }
 }

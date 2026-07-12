@@ -312,17 +312,19 @@ function filteredWardrobe() {
 }
 
 function itemImageStyle(item) {
-  if (item.image_url) {
-    const url = item.image_url.startsWith("http") 
-      ? item.image_url 
-      : `http://localhost:5000${item.image_url}`;
+  const imgUrl = item.cloudinary_url || item.image_url || item.imageUrl;
+  if (imgUrl) {
+    const url = imgUrl.startsWith("http") 
+      ? imgUrl 
+      : `http://localhost:5000${imgUrl}`;
     return `background-image:url('${url}');background-size:cover;background-position:center;`;
   }
   return "background:#f5e9da;display:grid;place-items:center;font-size:2.5rem;color:var(--muted);";
 }
 
 function itemImageContent(item) {
-  if (item.image_url) return "";
+  const imgUrl = item.cloudinary_url || item.image_url || item.imageUrl;
+  if (imgUrl) return "";
   const icons = { top: "👕", bottom: "👖", layer: "🧥", footwear: "👟", accessory: "⌚" };
   return icons[item.category] || "👔";
 }
