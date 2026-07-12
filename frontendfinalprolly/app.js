@@ -154,6 +154,11 @@ async function uploadItem(formEl) {
   const labels = document.querySelector("#uploadLabels").value;
   formData.append("labels", labels);
 
+  const submitBtn = formEl.querySelector("button[type='submit']");
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Uploading & Analyzing...";
+
   try {
     const headers = {};
     if (state.token) headers["Authorization"] = `Bearer ${state.token}`;
@@ -164,10 +169,14 @@ async function uploadItem(formEl) {
     showToast(`"${data.item.name}" added to wardrobe!`);
     uploadDialog.close();
     fileInput.value = "";
+    formEl.reset();
     await loadWardrobe();
     render();
   } catch (err) {
     showToast("Upload failed: " + err.message);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
   }
 }
 
