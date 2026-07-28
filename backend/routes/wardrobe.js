@@ -66,7 +66,7 @@ async function analyzeImageWithGemini(imageBuffer, mimeType) {
 }`;
 
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -176,11 +176,18 @@ router.post("/add", authMiddleware, upload.single("image"), async (req, res) => 
     if (req.file) {
       const localFilePath = path.join(uploadDir, req.file.filename);
       const cloudResult = await cloudinary.uploadImage(localFilePath);
+      console.log("[Wardrobe] Cloudinary upload response:", cloudResult); // ADDED LOG
+
       if (cloudResult) {
         item.cloudinary_url = cloudResult.url;
+        item.image_url = cloudResult.url; // Overwrite local path with Cloudinary URL
         item.cloudinary_id = cloudResult.public_id;
         item.cloud_status = "synced";
+        
+        console.log("[Wardrobe] MongoDB document before save:", item.toObject()); // ADDED LOG
         await item.save();
+        console.log("[Wardrobe] MongoDB document after save:", item.toObject()); // ADDED LOG
+        
         console.log(`[Wardrobe] Cloudinary sync successful for '${item.name}'`);
       } else {
         console.log(`[Wardrobe] Cloudinary failed for '${item.name}', queued for background sync.`);
@@ -189,10 +196,13 @@ router.post("/add", authMiddleware, upload.single("image"), async (req, res) => 
 
     console.log(`[Wardrobe] Item '${item.name}' added for user ${req.user.username} (qdrant: ${qdrantId || "n/a"})`);
 
-    res.status(201).json({
+    const apiResponse = {
       success: true,
       item,
-    });
+    };
+    console.log("[Wardrobe] API response sent to frontend:", apiResponse); // ADDED LOG
+
+    res.status(201).json(apiResponse);
   } catch (err) {
     console.error("[Wardrobe] Add error:", err.message);
     res.status(500).json({ success: false, message: err.message });

@@ -89,6 +89,11 @@ async function syncPendingUploads() {
       }
       
       const localFilePath = path.join(__dirname, "..", item.image_url);
+      if (!isConfigured) {
+        console.warn(`[Cloudinary Recovery] Cloudinary not configured. Skipping sync.`);
+        break; // Stop loop if not configured
+      }
+
       if (fs.existsSync(localFilePath)) {
         const uploadResult = await uploadImage(localFilePath);
         if (uploadResult) {
@@ -98,16 +103,11 @@ async function syncPendingUploads() {
           await item.save();
           successCount++;
         } else {
-          // Upload failed (e.g. invalid image), mark as failed to stop infinite loop
-          item.cloud_status = "failed";
-          await item.save();
-          console.warn(`[Cloudinary Recovery] Upload failed for item ${item._id}, marking as failed.`);
+          console.warn(`[Cloudinary Recovery] Upload failed for item ${item._id}, keeping as pending.`);
         }
       } else {
-        // Local file is missing, we can't sync it
-        item.cloud_status = "failed";
-        await item.save();
-        console.warn(`[Cloudinary Recovery] Local file missing for item ${item._id}`);
+        // Local file is missing on THIS machine (might exist on another collaborator's machine)
+        console.warn(`[Cloudinary Recovery] Local file missing for item ${item._id} on this machine. Keeping as pending.`);
       }
     }
 
